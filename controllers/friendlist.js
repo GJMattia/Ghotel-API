@@ -8,8 +8,28 @@ module.exports = {
     getFriendRequests,
     deleteRequest,
     acceptRequest,
-    getFriendList
+    getFriendList,
+    removeFriend
 };
+
+async function removeFriend(req, res) {
+    try {
+        const deleteID = req.params.deleteID;
+        const userID = req.user._id;
+        const userList = await FriendList.findOne({ user: userID });
+        const indexToDelete = userList.friends.findIndex(request => request._id == deleteID);
+
+        if (indexToDelete !== -1) {
+            userList.friends.splice(indexToDelete, 1);
+            await userList.save();
+        }
+        res.json({ message: 'question deleted successfully' })
+    } catch (error) {
+        console.error('Error deleting note', error);
+        res.status(500).json({ error: 'Failed to delete question' })
+    }
+
+}
 
 async function getFriendList(req, res) {
     try {
@@ -102,12 +122,3 @@ async function createFriendList(req, res) {
     }
 };
 
-
-//deletes request from requests array
-// const requestID = req.body._id;
-// const indexToDelete = userList.requests.findIndex(request => request._id == requestID);
-
-// if (indexToDelete !== -1) {
-//     userList.requests.splice(indexToDelete, 1);
-//     await userList.save();
-// };

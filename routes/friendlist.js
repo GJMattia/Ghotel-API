@@ -16,7 +16,9 @@ router.post('/request', friendListCtrl.sendFriendRequest);
 
 router.post('/:requestID', friendListCtrl.acceptRequest);
 
-router.delete('/:requestID', friendListCtrl.deleteRequest)
+router.delete('/:requestID', friendListCtrl.deleteRequest);
+
+router.delete('/friends/:deleteID', friendListCtrl.removeFriend);
 
 
 module.exports = router;
