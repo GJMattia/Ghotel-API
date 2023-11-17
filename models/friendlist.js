@@ -13,6 +13,10 @@ const friendList = new Schema({
         ID: String,
         name: String,
     }],
+    requestsSent: [{
+        ID: String,
+        name: String,
+    }],
 }, {
     timestamps: true,
 });
