@@ -14,6 +14,7 @@ module.exports = {
 async function removeFriend(req, res) {
     try {
         const deleteID = req.params.deleteID;
+        console.log(deleteID)
         const userID = req.user._id;
         const userList = await FriendList.findOne({ user: userID });
         const indexToDelete = userList.friends.findIndex(request => request._id == deleteID);
@@ -123,6 +124,8 @@ async function sendFriendRequest(req, res) {
         const newRequestSent = { ID: friendID, name: friendName };
         User.requestsSent.push(newRequestSent);
         await User.save();
+
+        res.json({ message: 'Request Sent Successfully' })
     } catch (error) {
         console.error('error creating sheet', error)
     }
