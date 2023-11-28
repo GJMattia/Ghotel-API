@@ -30,7 +30,6 @@ app.use('/friendlist', ensureLoggedIn, friendListRouter);
 
 
 
-
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
@@ -39,18 +38,29 @@ const io = new Server(server, {
     },
 });
 
+const messageHistory = {};
+
 io.on('connection', (socket) => {
     console.log(`User Connected: ${socket.id}`);
 
-
     socket.on('join_room', (data) => {
-        socket.join(data)
+        const { room } = data;
+        socket.join(room);
+
+        if (messageHistory[room]) {
+            socket.emit('message_history', { messages: messageHistory[room], room });
+        }
     });
 
-
     socket.on('send_message', (data) => {
-        // Emit the message to all users in the room, including the sender
-        io.to(data.room).emit('receive_message', data);
+        const { room, message } = data;
+
+        if (!messageHistory[room]) {
+            messageHistory[room] = [];
+        }
+        messageHistory[room].push(message);
+
+        io.to(room).emit('receive_message', data);
     });
 });
 

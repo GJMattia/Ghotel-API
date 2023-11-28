@@ -8,15 +8,21 @@ const friendList = new Schema({
     friends: [{
         ID: String,
         name: String,
+        room: Number
     }],
     requests: [{
         ID: String,
         name: String,
+        room: Number
     }],
     requestsSent: [{
         ID: String,
         name: String,
+        room: Number
     }],
+    room: {
+        type: Number
+    }
 }, {
     timestamps: true,
 });
