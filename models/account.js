@@ -8,7 +8,10 @@ const account = new Schema({
         type: Number,
         default: 500
     },
-    inventory: [],
+    inventory: {
+        type: [Number],
+        default: []
+    },
     rooms: []
 }, {
     timestamps: true,

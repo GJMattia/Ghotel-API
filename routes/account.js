@@ -8,6 +8,8 @@ router.post('/', accountCtrl.createAccount);
 
 router.get('/getaccount', accountCtrl.getAccount);
 
+router.put('/:accountID', accountCtrl.buyFurni);
+
 
 
 module.exports = router;

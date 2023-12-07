@@ -3,7 +3,21 @@ const Account = require('../models/account');
 
 module.exports = {
     createAccount,
-    getAccount
+    getAccount,
+    buyFurni
+};
+
+async function buyFurni(req, res) {
+    try {
+        const userAccount = await Account.findOne({ user: req.user._id });
+        userAccount.credits = userAccount.credits - req.body.itemPrice
+        userAccount.inventory.push(req.body.itemID)
+        await userAccount.save();
+        res.json(userAccount);
+    } catch (error) {
+        console.error('Error buying furni', error);
+        res.status(500).json({ error: 'Failed to buy furni' })
+    }
 };
 
 
