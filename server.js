@@ -6,6 +6,7 @@ const userRouter = require('./routes/users');
 const http = require('http');
 const { Server } = require('socket.io');
 const friendListRouter = require('./routes/friendlist');
+const accountRouter = require('./routes/account');
 
 const SERVERDEVPORT = 4741;
 const CLIENTDEVPORT = 5173;
@@ -26,6 +27,7 @@ app.use('/users', userRouter);
 const ensureLoggedIn = require('./config/ensureLoggedIn');
 
 app.use('/friendlist', ensureLoggedIn, friendListRouter);
+app.use('/account', ensureLoggedIn, accountRouter);
 
 
 

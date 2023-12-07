@@ -63,7 +63,6 @@ async function acceptRequest(req, res) {
         const userID = req.user._id;
         const userList = await FriendList.findOne({ user: userID });
         const newFriend = { ID: req.body.ID, name: req.body.name, room: req.body.room };
-        console.log(req.body.room)
         userList.friends.push(newFriend);
         await userList.save();
 
