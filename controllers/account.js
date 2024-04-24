@@ -4,7 +4,53 @@ const Account = require('../models/account');
 module.exports = {
     createAccount,
     getAccount,
-    buyFurni
+    buyFurni,
+    createRoom,
+    placeFurni,
+    clearRoom
+};
+
+async function clearRoom(req, res) {
+    try {
+        const userAccount = await Account.findOne({ user: req.user._id });
+        userAccount.rooms = userAccount.rooms.map(() => []);
+        await userAccount.save();
+        res.json('success');
+    } catch (error) {
+        console.error('Error clearing room', error);
+        res.status(500).json({ error: 'there was an error clearing the room' })
+    }
+
+}
+
+async function placeFurni(req, res) {
+    try {
+        const userAccount = await Account.findOne({ user: req.user._id });
+        userAccount.rooms[req.body.tileID].push(req.body.furniID);
+        const removeFurniIndex = userAccount.inventory.indexOf(req.body.furniID);
+        if (removeFurniIndex !== -1) {
+            userAccount.inventory.splice(removeFurniIndex, 1);
+        };
+        await userAccount.save();
+        res.json('success');
+    } catch (error) {
+        console.error('Error creating room', error);
+        res.status(500).json({ error: 'there was a bad error' })
+    }
+
+}
+
+async function createRoom(req, res) {
+    try {
+        const userAccount = await Account.findOne({ user: req.user._id });
+        const room = Array.from({ length: req.body.roomSize }, () => []);
+        userAccount.rooms.push(room);
+        await userAccount.save();
+        res.json('success');
+    } catch (error) {
+        console.error('Error creating room', error);
+        res.status(500).json({ error: 'there was a bad error' })
+    }
 };
 
 async function buyFurni(req, res) {

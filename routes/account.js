@@ -10,6 +10,10 @@ router.get('/getaccount', accountCtrl.getAccount);
 
 router.put('/:accountID', accountCtrl.buyFurni);
 
+router.put('/create/room', accountCtrl.createRoom);
 
+router.put('/place/furni', accountCtrl.placeFurni);
+
+router.put('/clear/room', accountCtrl.clearRoom);
 
 module.exports = router;

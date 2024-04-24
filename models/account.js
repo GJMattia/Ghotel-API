@@ -6,13 +6,16 @@ const account = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     credits: {
         type: Number,
-        default: 500
+        default: 5000
     },
     inventory: {
         type: [Number],
         default: []
     },
-    rooms: []
+    rooms: {
+        type: [[Number]],
+        default: Array.from({ length: 104 }, () => [])
+    }
 }, {
     timestamps: true,
 });
