@@ -7,8 +7,26 @@ module.exports = {
     buyFurni,
     createRoom,
     placeFurni,
-    clearRoom
+    clearRoom,
+    pickUpFurni
 };
+
+async function pickUpFurni(req, res) {
+    try {
+        const userAccount = await Account.findOne({ user: req.user._id });
+
+        userAccount.inventory.push(req.body.furniID);
+
+        userAccount.rooms[req.body.tileID].splice(req.body.furniIndex, 1);
+
+
+        await userAccount.save();
+        res.json('success');
+    } catch (error) {
+        console.error('Error clearing room', error);
+        res.status(500).json({ error: 'there was an error clearing the room' })
+    }
+}
 
 async function clearRoom(req, res) {
     try {

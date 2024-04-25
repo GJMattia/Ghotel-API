@@ -16,4 +16,6 @@ router.put('/place/furni', accountCtrl.placeFurni);
 
 router.put('/clear/room', accountCtrl.clearRoom);
 
+router.put('/pickup/furni', accountCtrl.pickUpFurni);
+
 module.exports = router;
