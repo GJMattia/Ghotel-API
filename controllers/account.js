@@ -13,15 +13,20 @@ module.exports = {
 
 async function pickUpFurni(req, res) {
     try {
+        console.log(req.body)
         const userAccount = await Account.findOne({ user: req.user._id });
-        // if (req.body.furniID === 1) {
-        //     userAccount.rooms[req.body.roomIndex].room[req.body.tileID - 13].splice(47, 1);
-        //     userAccount.rooms[req.body.roomIndex].room[req.body.tileID - 12].splice(47, 1);
-        //     userAccount.rooms[req.body.roomIndex].room[req.body.tileID + 1].splice(47, 1);
+        if (req.body.furniID === 47) {
+            userAccount.inventory.push(1);
+            userAccount.rooms[req.body.roomIndex].room[req.body.tileID].splice(req.body.furniIndex, 1);
+            userAccount.rooms[req.body.roomIndex].room[req.body.tileID - 13].splice(0, 1);
+            userAccount.rooms[req.body.roomIndex].room[req.body.tileID - 12].splice(0, 1);
+            userAccount.rooms[req.body.roomIndex].room[req.body.tileID + 1].splice(0, 1);
+        } else {
+            userAccount.rooms[req.body.roomIndex].room[req.body.tileID].splice(req.body.furniIndex, 1);
+            userAccount.inventory.push(req.body.furniID);
+        }
 
-        // }
-        userAccount.inventory.push(req.body.furniID);
-        userAccount.rooms[req.body.roomIndex].room[req.body.tileID].splice(req.body.furniIndex, 1);
+
         await userAccount.save();
         res.json('success');
     } catch (error) {
@@ -47,8 +52,26 @@ async function clearRoom(req, res) {
 async function placeFurni(req, res) {
     try {
         const userAccount = await Account.findOne({ user: req.user._id });
-        let gm = {
+        let p1 = {
             furniID: 47,
+            rotation: 0,
+            state: false,
+            height: req.body.furniHeight
+        };
+        let p2 = {
+            furniID: 48,
+            rotation: 0,
+            state: false,
+            height: req.body.furniHeight
+        };
+        let p3 = {
+            furniID: 49,
+            rotation: 0,
+            state: false,
+            height: req.body.furniHeight
+        };
+        let p4 = {
+            furniID: 50,
             rotation: 0,
             state: false,
             height: req.body.furniHeight
@@ -60,13 +83,15 @@ async function placeFurni(req, res) {
             state: false,
             height: req.body.furniHeight
         };
-        // if (req.body.furniID === 1) {
-        //     userAccount.rooms[req.body.roomIndex].room[req.body.tileID - 13].push(gm);
-        //     userAccount.rooms[req.body.roomIndex].room[req.body.tileID - 12].push(gm);
-        //     userAccount.rooms[req.body.roomIndex].room[req.body.tileID + 1].push(gm);
-        // }
 
-        userAccount.rooms[req.body.roomIndex].room[req.body.tileID].push(newFurni);
+        if (req.body.furniID === 1) {
+            userAccount.rooms[req.body.roomIndex].room[req.body.tileID].push(p1);
+            userAccount.rooms[req.body.roomIndex].room[req.body.tileID - 13].push(p2);
+            userAccount.rooms[req.body.roomIndex].room[req.body.tileID - 12].push(p4);
+            userAccount.rooms[req.body.roomIndex].room[req.body.tileID + 1].push(p3);
+        } else {
+            userAccount.rooms[req.body.roomIndex].room[req.body.tileID].push(newFurni);
+        }
         await userAccount.save();
         res.json('success');
     } catch (error) {
