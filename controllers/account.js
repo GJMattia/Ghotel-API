@@ -14,12 +14,14 @@ module.exports = {
 async function pickUpFurni(req, res) {
     try {
         const userAccount = await Account.findOne({ user: req.user._id });
+        // if (req.body.furniID === 1) {
+        //     userAccount.rooms[req.body.roomIndex].room[req.body.tileID - 13].splice(47, 1);
+        //     userAccount.rooms[req.body.roomIndex].room[req.body.tileID - 12].splice(47, 1);
+        //     userAccount.rooms[req.body.roomIndex].room[req.body.tileID + 1].splice(47, 1);
 
+        // }
         userAccount.inventory.push(req.body.furniID);
-
-        userAccount.rooms[req.body.tileID].splice(req.body.furniIndex, 1);
-
-
+        userAccount.rooms[req.body.roomIndex].room[req.body.tileID].splice(req.body.furniIndex, 1);
         await userAccount.save();
         res.json('success');
     } catch (error) {
@@ -30,8 +32,9 @@ async function pickUpFurni(req, res) {
 
 async function clearRoom(req, res) {
     try {
+        console.log(req.body)
         const userAccount = await Account.findOne({ user: req.user._id });
-        userAccount.rooms = userAccount.rooms.map(() => []);
+        userAccount.rooms[req.body.roomIndex].room = Array.from({ length: req.body.roomSize }, () => []);
         await userAccount.save();
         res.json('success');
     } catch (error) {
@@ -44,25 +47,46 @@ async function clearRoom(req, res) {
 async function placeFurni(req, res) {
     try {
         const userAccount = await Account.findOne({ user: req.user._id });
-        userAccount.rooms[req.body.tileID].push(req.body.furniID);
-        const removeFurniIndex = userAccount.inventory.indexOf(req.body.furniID);
-        if (removeFurniIndex !== -1) {
-            userAccount.inventory.splice(removeFurniIndex, 1);
+        let gm = {
+            furniID: 47,
+            rotation: 0,
+            state: false,
+            height: req.body.furniHeight
         };
+
+        let newFurni = {
+            furniID: req.body.furniID,
+            rotation: 0,
+            state: false,
+            height: req.body.furniHeight
+        };
+        // if (req.body.furniID === 1) {
+        //     userAccount.rooms[req.body.roomIndex].room[req.body.tileID - 13].push(gm);
+        //     userAccount.rooms[req.body.roomIndex].room[req.body.tileID - 12].push(gm);
+        //     userAccount.rooms[req.body.roomIndex].room[req.body.tileID + 1].push(gm);
+        // }
+
+        userAccount.rooms[req.body.roomIndex].room[req.body.tileID].push(newFurni);
         await userAccount.save();
         res.json('success');
     } catch (error) {
         console.error('Error creating room', error);
         res.status(500).json({ error: 'there was a bad error' })
     }
-
-}
+};
 
 async function createRoom(req, res) {
     try {
         const userAccount = await Account.findOne({ user: req.user._id });
-        const room = Array.from({ length: req.body.roomSize }, () => []);
-        userAccount.rooms.push(room);
+        const newRoom = {
+            roomName: req.body.roomName,
+            roomDescription: req.body.roomDescription,
+            chat: 0,
+            floorColor: req.body.floorColor,
+            room: Array.from({ length: req.body.roomSize }, () => []),
+            roomSize: req.body.roomSize
+        }
+        userAccount.rooms.push(newRoom);
         await userAccount.save();
         res.json('success');
     } catch (error) {
@@ -75,7 +99,9 @@ async function buyFurni(req, res) {
     try {
         const userAccount = await Account.findOne({ user: req.user._id });
         userAccount.credits = userAccount.credits - req.body.itemPrice
-        userAccount.inventory.push(req.body.itemID)
+        for (let i = 0; i < 10; i++) {
+            userAccount.inventory.push(req.body.itemID);
+        };
         await userAccount.save();
         res.json(userAccount);
     } catch (error) {

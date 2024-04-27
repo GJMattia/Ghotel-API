@@ -13,12 +13,20 @@ const account = new Schema({
         default: []
     },
     rooms: {
-        type: [[Number]],
-        default: Array.from({ length: 104 }, () => [])
+        type: [{
+            roomName: String,
+            roomDescription: String,
+            chat: Number,
+            floorColor: String,
+            roomSize: Number,
+            room: [[]]
+        }],
     }
 }, {
     timestamps: true,
 });
+
+
 
 
 
