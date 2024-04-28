@@ -33,7 +33,7 @@ async function roomColor(req, res) {
         const userAccount = await Account.findOne({ user: req.user._id });
         userAccount.rooms[req.body.roomIndex].floorColor = colors[random];
         await userAccount.save();
-        res.json('success');
+        res.json(userAccount);
     } catch (error) {
         console.error('Error rotating furni', error);
         res.status(500).json({ error: 'there was an error rotating the furni' })
@@ -46,7 +46,7 @@ async function deleteRoom(req, res) {
         const userAccount = await Account.findOne({ user: req.user._id });
         userAccount.rooms.splice(req.body.roomIndex, 1);
         await userAccount.save();
-        res.json('success');
+        res.json(userAccount);
     } catch (error) {
         console.error('Error creating room', error);
         res.status(500).json({ error: 'there was a bad error' })
@@ -58,7 +58,7 @@ async function clearInventory(req, res) {
         const userAccount = await Account.findOne({ user: req.user._id });
         userAccount.inventory = [];
         await userAccount.save();
-        res.json('success');
+        res.json(userAccount);
     } catch (error) {
         console.error('Error clearing inventory', error);
         res.status(500).json({ error: 'there was an error clearing your inventory' })
@@ -71,7 +71,7 @@ async function useFurni(req, res) {
         const userAccount = await Account.findOne({ user: req.user._id });
         userAccount.rooms[req.body.roomIndex].room[req.body.tileID][req.body.furniIndex].state = !userAccount.rooms[req.body.roomIndex].room[req.body.tileID][req.body.furniIndex].state;
         await userAccount.save();
-        res.json('success');
+        res.json(userAccount);
     } catch (error) {
         console.error('Error using furni', error);
         res.status(500).json({ error: 'there was an error using the furni' })
@@ -84,7 +84,7 @@ async function rotateFurni(req, res) {
         const userAccount = await Account.findOne({ user: req.user._id });
         userAccount.rooms[req.body.roomIndex].room[req.body.tileID][req.body.furniIndex].rotation = !userAccount.rooms[req.body.roomIndex].room[req.body.tileID][req.body.furniIndex].rotation;
         await userAccount.save();
-        res.json('success');
+        res.json(userAccount);
     } catch (error) {
         console.error('Error rotating furni', error);
         res.status(500).json({ error: 'there was an error rotating the furni' })
@@ -105,11 +105,9 @@ async function pickUpFurni(req, res) {
         } else {
             userAccount.rooms[req.body.roomIndex].room[req.body.tileID].splice(req.body.furniIndex, 1);
             userAccount.inventory.push(req.body.furniID);
-        }
-
-
+        };
         await userAccount.save();
-        res.json('success');
+        res.json(userAccount);
     } catch (error) {
         console.error('Error clearing room', error);
         res.status(500).json({ error: 'there was an error clearing the room' })
@@ -121,7 +119,7 @@ async function clearRoom(req, res) {
         const userAccount = await Account.findOne({ user: req.user._id });
         userAccount.rooms[req.body.roomIndex].room = Array.from({ length: req.body.roomSize }, () => []);
         await userAccount.save();
-        res.json('success');
+        res.json(userAccount);
     } catch (error) {
         console.error('Error clearing room', error);
         res.status(500).json({ error: 'there was an error clearing the room' })
@@ -173,9 +171,8 @@ async function placeFurni(req, res) {
         }
         let furniIndex = userAccount.inventory.indexOf(req.body.furniID);
         userAccount.inventory.splice(furniIndex, 1);
-
         await userAccount.save();
-        res.json('success');
+        res.json(userAccount);
     } catch (error) {
         console.error('Error creating room', error);
         res.status(500).json({ error: 'there was a bad error' })
@@ -195,7 +192,7 @@ async function createRoom(req, res) {
         }
         userAccount.rooms.push(newRoom);
         await userAccount.save();
-        res.json('success');
+        res.json(userAccount);
     } catch (error) {
         console.error('Error creating room', error);
         res.status(500).json({ error: 'there was a bad error' })
