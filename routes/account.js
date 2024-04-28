@@ -18,4 +18,14 @@ router.put('/clear/room', accountCtrl.clearRoom);
 
 router.put('/pickup/furni', accountCtrl.pickUpFurni);
 
+router.put('/rotate/furni', accountCtrl.rotateFurni);
+
+router.put('/use/furni', accountCtrl.useFurni);
+
+router.put('/clear/inventory', accountCtrl.clearInventory);
+
+router.put('/delete/room', accountCtrl.deleteRoom);
+
+router.put('/room/color', accountCtrl.roomColor);
+
 module.exports = router;
