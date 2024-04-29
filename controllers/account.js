@@ -1,6 +1,5 @@
 const Account = require('../models/account');
 
-
 module.exports = {
     createAccount,
     getAccount,
@@ -14,8 +13,21 @@ module.exports = {
     clearInventory,
     deleteRoom,
     roomColor,
-    getRoomData
+    getRoomData,
+    searchUser
 };
+
+async function searchUser(req, res) {
+    try {
+
+        const search = await Account.findOne({ user: req.body.search }, { rooms: 1 });
+        let roomNames = search.rooms.map(room => room.roomName);
+        res.json(roomNames);
+    } catch (error) {
+        console.error('Error searching user', error);
+        res.status(500).json({ error: 'error searching user' })
+    }
+}
 
 async function getRoomData(req, res) {
     try {

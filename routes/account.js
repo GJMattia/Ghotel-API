@@ -30,4 +30,6 @@ router.put('/delete/room', accountCtrl.deleteRoom);
 
 router.put('/room/color', accountCtrl.roomColor);
 
+router.put('/search/user', accountCtrl.searchUser)
+
 module.exports = router;
