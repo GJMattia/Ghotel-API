@@ -6,9 +6,11 @@ const accountCtrl = require('../controllers/account');
 
 router.post('/', accountCtrl.createAccount);
 
+router.put('/get/room', accountCtrl.getRoomData);
+
 router.get('/getaccount', accountCtrl.getAccount);
 
-router.put('/:accountID', accountCtrl.buyFurni);
+router.put('/buy/furni', accountCtrl.buyFurni);
 
 router.put('/create/room', accountCtrl.createRoom);
 

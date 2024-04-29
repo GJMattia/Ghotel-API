@@ -13,8 +13,25 @@ module.exports = {
     useFurni,
     clearInventory,
     deleteRoom,
-    roomColor
+    roomColor,
+    getRoomData
 };
+
+async function getRoomData(req, res) {
+    try {
+        const account = await Account.findOne(
+            { user: req.user._id },
+            { rooms: 1 }
+        );
+        const room = account.rooms[req.body.roomIndex];
+        res.json(room);
+    } catch (error) {
+        console.error('Error getting room', error);
+        res.status(500).json({ error: 'error getting room' })
+    }
+}
+
+
 
 async function roomColor(req, res) {
     try {
@@ -30,10 +47,15 @@ async function roomColor(req, res) {
             'black'
         ];
         let random = Math.floor(Math.random() * 9);
-        const userAccount = await Account.findOne({ user: req.user._id });
-        userAccount.rooms[req.body.roomIndex].floorColor = colors[random];
-        await userAccount.save();
-        res.json(userAccount);
+
+        const account = await Account.findOne(
+            { user: req.user._id },
+            { rooms: 1 }
+        );
+
+        account.rooms[req.body.roomIndex].floorColor = colors[random];
+        await account.save();
+        res.json(account.rooms[req.body.roomIndex]);
     } catch (error) {
         console.error('Error rotating furni', error);
         res.status(500).json({ error: 'there was an error rotating the furni' })
@@ -43,10 +65,18 @@ async function roomColor(req, res) {
 
 async function deleteRoom(req, res) {
     try {
-        const userAccount = await Account.findOne({ user: req.user._id });
-        userAccount.rooms.splice(req.body.roomIndex, 1);
-        await userAccount.save();
-        res.json(userAccount);
+        const account = await Account.findOne(
+            { user: req.user._id },
+            { rooms: 1 }
+        );
+        account.rooms.splice(req.body.roomIndex, 1);
+
+        const roomNames = [];
+        for (let i = 0; i < account.rooms.length; i++) {
+            roomNames.push(account.rooms[i].roomName);
+        };
+        await account.save();
+        res.json(roomNames);
     } catch (error) {
         console.error('Error creating room', error);
         res.status(500).json({ error: 'there was a bad error' })
@@ -58,7 +88,7 @@ async function clearInventory(req, res) {
         const userAccount = await Account.findOne({ user: req.user._id });
         userAccount.inventory = [];
         await userAccount.save();
-        res.json(userAccount);
+        res.json(userAccount.inventory);
     } catch (error) {
         console.error('Error clearing inventory', error);
         res.status(500).json({ error: 'there was an error clearing your inventory' })
@@ -68,10 +98,13 @@ async function clearInventory(req, res) {
 
 async function useFurni(req, res) {
     try {
-        const userAccount = await Account.findOne({ user: req.user._id });
-        userAccount.rooms[req.body.roomIndex].room[req.body.tileID][req.body.furniIndex].state = !userAccount.rooms[req.body.roomIndex].room[req.body.tileID][req.body.furniIndex].state;
-        await userAccount.save();
-        res.json(userAccount);
+        const account = await Account.findOne(
+            { user: req.user._id },
+            { rooms: 1 }
+        );
+        account.rooms[req.body.roomIndex].room[req.body.tileID][req.body.furniIndex].state = !account.rooms[req.body.roomIndex].room[req.body.tileID][req.body.furniIndex].state;
+        await account.save();
+        res.json(account.rooms[req.body.roomIndex]);
     } catch (error) {
         console.error('Error using furni', error);
         res.status(500).json({ error: 'there was an error using the furni' })
@@ -81,10 +114,13 @@ async function useFurni(req, res) {
 
 async function rotateFurni(req, res) {
     try {
-        const userAccount = await Account.findOne({ user: req.user._id });
-        userAccount.rooms[req.body.roomIndex].room[req.body.tileID][req.body.furniIndex].rotation = !userAccount.rooms[req.body.roomIndex].room[req.body.tileID][req.body.furniIndex].rotation;
-        await userAccount.save();
-        res.json(userAccount);
+        const account = await Account.findOne(
+            { user: req.user._id },
+            { rooms: 1 }
+        );
+        account.rooms[req.body.roomIndex].room[req.body.tileID][req.body.furniIndex].rotation = !account.rooms[req.body.roomIndex].room[req.body.tileID][req.body.furniIndex].rotation;
+        await account.save();
+        res.json(account.rooms[req.body.roomIndex]);
     } catch (error) {
         console.error('Error rotating furni', error);
         res.status(500).json({ error: 'there was an error rotating the furni' })
@@ -107,7 +143,7 @@ async function pickUpFurni(req, res) {
             userAccount.inventory.push(req.body.furniID);
         };
         await userAccount.save();
-        res.json(userAccount);
+        res.json({ room: userAccount.rooms[req.body.roomIndex], inventory: userAccount.inventory });
     } catch (error) {
         console.error('Error clearing room', error);
         res.status(500).json({ error: 'there was an error clearing the room' })
@@ -116,10 +152,15 @@ async function pickUpFurni(req, res) {
 
 async function clearRoom(req, res) {
     try {
-        const userAccount = await Account.findOne({ user: req.user._id });
-        userAccount.rooms[req.body.roomIndex].room = Array.from({ length: req.body.roomSize }, () => []);
-        await userAccount.save();
-        res.json(userAccount);
+        const account = await Account.findOne(
+            { user: req.user._id },
+            { rooms: 1 }
+        );
+
+        account.rooms[req.body.roomIndex].room = Array.from({ length: req.body.roomSize }, () => []);
+        await account.save();
+        const room = account.rooms[req.body.roomIndex];
+        res.json(room);
     } catch (error) {
         console.error('Error clearing room', error);
         res.status(500).json({ error: 'there was an error clearing the room' })
@@ -172,7 +213,7 @@ async function placeFurni(req, res) {
         let furniIndex = userAccount.inventory.indexOf(req.body.furniID);
         userAccount.inventory.splice(furniIndex, 1);
         await userAccount.save();
-        res.json(userAccount);
+        res.json({ room: userAccount.rooms[req.body.roomIndex], inventory: userAccount.inventory });
     } catch (error) {
         console.error('Error creating room', error);
         res.status(500).json({ error: 'there was a bad error' })
@@ -181,7 +222,10 @@ async function placeFurni(req, res) {
 
 async function createRoom(req, res) {
     try {
-        const userAccount = await Account.findOne({ user: req.user._id });
+        const account = await Account.findOne(
+            { user: req.user._id },
+            { rooms: 1 }
+        );
         const newRoom = {
             roomName: req.body.roomName,
             roomDescription: req.body.roomDescription,
@@ -190,9 +234,14 @@ async function createRoom(req, res) {
             room: Array.from({ length: req.body.roomSize }, () => []),
             roomSize: req.body.roomSize
         }
-        userAccount.rooms.push(newRoom);
-        await userAccount.save();
-        res.json(userAccount);
+        account.rooms.push(newRoom);
+        await account.save();
+
+        const roomNames = [];
+        for (let i = 0; i < account.rooms.length; i++) {
+            roomNames.push(account.rooms[i].roomName);
+        };
+        res.json(roomNames);
     } catch (error) {
         console.error('Error creating room', error);
         res.status(500).json({ error: 'there was a bad error' })
@@ -201,13 +250,19 @@ async function createRoom(req, res) {
 
 async function buyFurni(req, res) {
     try {
-        const userAccount = await Account.findOne({ user: req.user._id });
-        userAccount.credits = userAccount.credits - req.body.itemPrice
+        const account = await Account.findOne(
+            { user: req.user._id },
+            { credits: 1, inventory: 1 }
+        );
+
+
+        account.credits = account.credits - req.body.itemPrice
         for (let i = 0; i < 10; i++) {
-            userAccount.inventory.push(req.body.itemID);
+            account.inventory.push(req.body.itemID);
         };
-        await userAccount.save();
-        res.json(userAccount);
+
+        await account.save();
+        res.json({ credits: account.credits, inventory: account.inventory });
     } catch (error) {
         console.error('Error buying furni', error);
         res.status(500).json({ error: 'Failed to buy furni' })
@@ -219,7 +274,11 @@ async function getAccount(req, res) {
     try {
         const userID = req.user._id;
         const userAccount = await Account.findOne({ user: userID });
-        res.json(userAccount);
+        const roomNames = [];
+        for (let i = 0; i < userAccount.rooms.length; i++) {
+            roomNames.push(userAccount.rooms[i].roomName);
+        };
+        res.json({ credits: userAccount.credits, inventory: userAccount.inventory, roomNames: roomNames });
     } catch (error) {
         console.error('Error finding account', error);
         res.status(500).json({ error: 'Failed to find the account' })
