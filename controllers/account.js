@@ -45,13 +45,9 @@ async function buyFurni(req, res) {
 
 async function getAccount(req, res) {
     try {
-        const userID = req.user._id;
-        const userAccount = await Account.findOne({ user: userID });
-        const roomNames = [];
-        for (let i = 0; i < userAccount.rooms.length; i++) {
-            roomNames.push(userAccount.rooms[i].roomName);
-        };
-        res.json({ credits: userAccount.credits, inventory: userAccount.inventory, roomNames: roomNames });
+        const account = await Account.findOne({ user: req.user._id });
+
+        res.json(account);
     } catch (error) {
         console.error('Error finding account', error);
         res.status(500).json({ error: 'Failed to find the account' })

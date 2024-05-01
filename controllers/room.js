@@ -13,7 +13,20 @@ module.exports = {
     clearRoom,
     deleteRoom,
     roomColor,
-    searchUser
+    searchUser,
+    wallType
+};
+
+async function wallType(req, res) {
+    try {
+        const room = await Room.findOne({ _id: req.body.roomID }).select('wallType');
+        room.wallType = req.body.wallType;
+        await room.save();
+        res.json(room.wallType);
+    } catch (error) {
+        console.error('Error rotating furni', error);
+        res.status(500).json({ error: 'there was an error rotating the furni' })
+    }
 };
 
 async function searchUser(req, res) {
@@ -46,8 +59,8 @@ async function roomColor(req, res) {
 async function deleteRoom(req, res) {
     try {
         await Room.deleteOne({ _id: req.params.roomID });
-        const userRooms = await Room.find({ user: req.user._id }).select('roomName _id');
-        res.json(userRooms)
+        // const userRooms = await Room.find({ user: req.user._id }).select('roomName _id');
+        res.json(null)
     } catch (error) {
         console.error('Error getting room', error);
         res.status(500).json({ error: 'error getting room' })
@@ -191,6 +204,7 @@ async function createRoom(req, res) {
             roomDescription: req.body.roomDescription,
             chat: 0,
             floorColor: req.body.floorColor,
+            wallType: req.body.wallType,
             roomSize: req.body.roomSize,
             room: Array.from({ length: req.body.roomSize }, () => [])
         });

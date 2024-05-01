@@ -24,6 +24,8 @@ router.delete('/:roomID', roomCtrl.deleteRoom);
 
 router.put('/room/color', roomCtrl.roomColor);
 
-router.put('/search/user', roomCtrl.searchUser)
+router.put('/search/user', roomCtrl.searchUser);
+
+router.put('/room/wall', roomCtrl.wallType);
 
 module.exports = router;

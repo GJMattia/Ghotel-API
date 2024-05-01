@@ -14,6 +14,7 @@ const room = new Schema({
     roomDescription: String,
     chat: Number,
     floorColor: String,
+    wallType: Number,
     roomSize: Number,
     room: [[furni]]
 },
