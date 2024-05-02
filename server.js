@@ -45,9 +45,12 @@ const io = new Server(server, {
 });
 
 const messageHistory = {};
+const userHistory = {};
+const rooms = {};
 
+// CHAT
 io.on('connection', (socket) => {
-    console.log(`User Connected: ${socket.id}`);
+    // console.log(`User Connected: ${socket.id}`);
 
     socket.on('join_room', (data) => {
         const { room } = data;
@@ -70,6 +73,28 @@ io.on('connection', (socket) => {
     });
 });
 
+//ROOM JOIN
+io.on('connection', (socket) => {
+    // console.log(`User connected: ${socket.id}`);
+    socket.on('join_josh', ({ username, roomNumber }) => {
+        socket.join(roomNumber);
+        io.to(roomNumber).emit('user_joined', { username });
+    });
+
+    socket.on('leave_room', ({ username, roomNumber }) => {
+        socket.leave(roomNumber);
+        io.to(roomNumber).emit('user_left', { username });
+    });
+
+    socket.on('send_message', ({ username, message, roomNumber }) => {
+        io.to(roomNumber).emit('receive_message', { username, message });
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`User disconnected: ${socket.id}`);
+        // Implement any necessary cleanup logic here
+    });
+});
 
 server.listen(PORT, () => {
     console.log('listening on port ' + PORT);

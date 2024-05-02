@@ -202,12 +202,13 @@ async function createRoom(req, res) {
             user: user,
             roomName: req.body.roomName,
             roomDescription: req.body.roomDescription,
-            chat: 0,
+            chat: Math.floor(Math.random() * 3000) + 1,
             floorColor: req.body.floorColor,
             wallType: req.body.wallType,
             roomSize: req.body.roomSize,
             room: Array.from({ length: req.body.roomSize }, () => [])
         });
+
         const userRooms = await Room.find({ user: user }).select('roomName _id');
         res.json(userRooms)
     } catch (error) {
