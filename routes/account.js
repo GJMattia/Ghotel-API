@@ -11,4 +11,7 @@ router.put('/buy/furni', accountCtrl.buyFurni);
 
 router.put('/clear/inventory', accountCtrl.clearInventory);
 
+router.put('/change/sprite', accountCtrl.changeSprite);
+
+
 module.exports = router;

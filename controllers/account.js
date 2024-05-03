@@ -4,10 +4,22 @@ module.exports = {
     createAccount,
     getAccount,
     buyFurni,
-    clearInventory
+    clearInventory,
+    changeSprite
 };
 
 
+async function changeSprite(req, res) {
+    try {
+        const account = await Account.findOne({ user: req.user._id }, { sprite: 1 });
+        account.sprite = req.body.sprite;
+        await account.save();
+        res.json(account.sprite);
+    } catch (error) {
+        console.error('Error changing sprite', error);
+        res.status(500).json({ error: 'error changing sprite' })
+    }
+};
 
 async function clearInventory(req, res) {
     try {

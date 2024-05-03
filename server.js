@@ -45,14 +45,11 @@ const io = new Server(server, {
 });
 
 const messageHistory = {};
-const userHistory = {};
-const rooms = {};
 
-// CHAT
+
 io.on('connection', (socket) => {
-    // console.log(`User Connected: ${socket.id}`);
-
-    socket.on('join_room', (data) => {
+    // CHAT
+    socket.on('join_chat', (data) => {
         const { room } = data;
         socket.join(room);
 
@@ -71,12 +68,10 @@ io.on('connection', (socket) => {
 
         io.to(room).emit('receive_message', data);
     });
-});
 
-//ROOM JOIN
-io.on('connection', (socket) => {
-    // console.log(`User connected: ${socket.id}`);
-    socket.on('join_josh', ({ username, roomNumber }) => {
+
+    // ROOM JOIN FOR CHATTING AND USER VISIBLITY 
+    socket.on('join_room', ({ username, roomNumber }) => {
         socket.join(roomNumber);
         io.to(roomNumber).emit('user_joined', { username });
     });
@@ -94,7 +89,23 @@ io.on('connection', (socket) => {
         console.log(`User disconnected: ${socket.id}`);
         // Implement any necessary cleanup logic here
     });
+
+    //ROOM DATA TRANSFER 64
+
+    socket.on('send_change', ({ username, roomNumber, roomChange }) => {
+        io.to(roomNumber).emit('receive_change', { username, roomChange });
+    })
+
+    socket.on('send_sprite', ({ username, roomNumber, sprite }) => {
+        io.to(roomNumber).emit('receive_sprite', { username, sprite });
+    })
+
+
+
 });
+
+
+
 
 server.listen(PORT, () => {
     console.log('listening on port ' + PORT);
