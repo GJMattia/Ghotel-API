@@ -45,6 +45,7 @@ const io = new Server(server, {
 });
 
 const messageHistory = {};
+let spriteHistory = {};
 
 
 io.on('connection', (socket) => {
@@ -70,7 +71,7 @@ io.on('connection', (socket) => {
     });
 
 
-    // ROOM JOIN FOR CHATTING AND USER VISIBLITY 
+    // Room population
     socket.on('join_room', ({ username, roomNumber }) => {
         socket.join(roomNumber);
         io.to(roomNumber).emit('user_joined', { username });
@@ -81,24 +82,91 @@ io.on('connection', (socket) => {
         io.to(roomNumber).emit('user_left', { username });
     });
 
+
+    //Room chatting
     socket.on('send_message', ({ username, message, roomNumber }) => {
         io.to(roomNumber).emit('receive_message', { username, message });
     });
 
     socket.on('disconnect', () => {
-        console.log(`User disconnected: ${socket.id}`);
+        // console.log(`User disconnected: ${socket.id}`);
         // Implement any necessary cleanup logic here
     });
 
     //ROOM DATA TRANSFER 64
-
     socket.on('send_change', ({ username, roomNumber, roomChange }) => {
         io.to(roomNumber).emit('receive_change', { username, roomChange });
     })
 
-    socket.on('send_sprite', ({ username, roomNumber, sprite }) => {
-        io.to(roomNumber).emit('receive_sprite', { username, sprite });
-    })
+
+    //Sprites
+
+    socket.on('add_sprite', (data) => {
+        const { roomNumber } = data;
+        // Check if the roomNumber exists in spriteHistory
+        if (!spriteHistory.hasOwnProperty(roomNumber)) {
+            spriteHistory[roomNumber] = [];
+        }
+
+        if (!socket.rooms.has(roomNumber)) {
+            socket.join(roomNumber);
+        }
+
+        // Check if the user's sprite data already exists for the room
+        const userSpriteIndex = spriteHistory[roomNumber].findIndex(spriteData => spriteData.username === data.username);
+        if (userSpriteIndex === -1) {
+            // If the user's sprite data doesn't exist, add it to spriteHistory
+            spriteHistory[roomNumber].push(data);
+        }
+
+        // Emit sprite data to all clients in the room
+        io.to(roomNumber).emit('sprite_data', spriteHistory[roomNumber]);
+    });
+
+    socket.on('move_sprite', (data) => {
+        const roomNumber = data.roomNumber
+        io.to(roomNumber).emit('move1_sprite', { username: data.username, tileID: data.tileID });
+
+        if (spriteHistory.hasOwnProperty(data.roomNumber)) {
+
+            const room = spriteHistory[roomNumber];
+
+            const userIndex = room.findIndex(user => user.username === data.username);
+            if (userIndex !== -1) {
+
+                room[userIndex].tileID = data.tileID;
+            }
+        }
+    });
+
+    socket.on('height_sprite', (data) => {
+        const roomNumber = data.roomNumber
+        io.to(roomNumber).emit('move2_sprite', { username: data.username, height: data.height });
+
+        if (spriteHistory.hasOwnProperty(data.roomNumber)) {
+
+            const room = spriteHistory[roomNumber];
+
+            const userIndex = room.findIndex(user => user.username === data.username);
+            if (userIndex !== -1) {
+
+                room[userIndex].height = data.height;
+            }
+        }
+    });
+
+    socket.on('leave_sprite', ({ username, roomNumber }) => {
+        socket.leave(roomNumber);
+
+        io.to(roomNumber).emit('sprite_left', { username });
+
+        // Remove the user's sprite data from spriteHistory for the specified room
+        if (spriteHistory.hasOwnProperty(roomNumber)) {
+            spriteHistory[roomNumber] = spriteHistory[roomNumber].filter(sprite => sprite.username !== username);
+        }
+    });
+
+
 
 
 
