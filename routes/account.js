@@ -13,5 +13,7 @@ router.put('/clear/inventory', accountCtrl.clearInventory);
 
 router.put('/change/sprite', accountCtrl.changeSprite);
 
+router.get('/user/:username', accountCtrl.getSprite)
+
 
 module.exports = router;

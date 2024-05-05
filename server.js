@@ -89,6 +89,7 @@ io.on('connection', (socket) => {
 
             chooserHistory[roomNumber].push(username);
         }
+
         // Emit sprite data to all clients in the room
         io.to(roomNumber).emit('user_joined', chooserHistory[roomNumber]);
     });
@@ -99,10 +100,15 @@ io.on('connection', (socket) => {
         if (chooserHistory[roomNumber]) {
             const userSpriteIndex = chooserHistory[roomNumber].findIndex(name => name === username);
 
-            if (userSpriteIndex === -1) {
-                chooserHistory[roomNumber] = chooserHistory[roomNumber].filter(item => item !== username);
+            if (userSpriteIndex !== -1) {
+                chooserHistory[roomNumber].splice(userSpriteIndex, 1);
+
             };
         };
+        if (!chooserHistory[roomNumber]?.length) {
+            delete chooserHistory[roomNumber];
+        }
+
         io.to(roomNumber).emit('user_left', username);
     });
 

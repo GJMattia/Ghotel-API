@@ -77,8 +77,8 @@ async function roomColor(req, res) {
 async function deleteRoom(req, res) {
     try {
         await Room.deleteOne({ _id: req.params.roomID });
-        // const userRooms = await Room.find({ user: req.user._id }).select('roomName _id');
-        res.json(null)
+        const userRooms = await Room.find({ user: req.user._id }).select('roomName _id');
+        res.json(userRooms);
     } catch (error) {
         console.error('Error getting room', error);
         res.status(500).json({ error: 'error getting room' })

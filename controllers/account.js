@@ -1,11 +1,30 @@
 const Account = require('../models/account');
+const User = require('../models/user');
 
 module.exports = {
     createAccount,
     getAccount,
     buyFurni,
     clearInventory,
-    changeSprite
+    changeSprite,
+    getSprite
+};
+
+async function getSprite(req, res) {
+    try {
+        const user = await User.findOne({ name: req.params.username }).select('name');
+        const account = await Account.findOne(
+            { user: user._id },
+            { sprite: 1, badges: 1, motto: 1 }
+        ).lean();
+
+
+        account.username = user.name;
+        res.json(account);
+    } catch (error) {
+        console.error('Error changing sprite', error);
+        res.status(500).json({ error: 'error changing sprite' })
+    }
 };
 
 
