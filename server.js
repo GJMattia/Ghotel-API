@@ -45,7 +45,8 @@ const io = new Server(server, {
 });
 
 const messageHistory = {};
-let spriteHistory = {};
+const spriteHistory = {};
+const chooserHistory = {};
 
 
 io.on('connection', (socket) => {
@@ -71,15 +72,38 @@ io.on('connection', (socket) => {
     });
 
 
-    // Room population
+    // Chooser
     socket.on('join_room', ({ username, roomNumber }) => {
-        socket.join(roomNumber);
-        io.to(roomNumber).emit('user_joined', { username });
+        // Check if the roomNumber exists in spriteHistory
+        if (!chooserHistory.hasOwnProperty(roomNumber)) {
+            chooserHistory[roomNumber] = [];
+        }
+
+        if (!socket.rooms.has(roomNumber)) {
+            socket.join(roomNumber);
+        }
+
+        // Check if the user's sprite data already exists for the room
+        const userSpriteIndex = chooserHistory[roomNumber].findIndex(name => name === username);
+        if (userSpriteIndex === -1) {
+
+            chooserHistory[roomNumber].push(username);
+        }
+        // Emit sprite data to all clients in the room
+        io.to(roomNumber).emit('user_joined', chooserHistory[roomNumber]);
     });
 
     socket.on('leave_room', ({ username, roomNumber }) => {
         socket.leave(roomNumber);
-        io.to(roomNumber).emit('user_left', { username });
+
+        if (chooserHistory[roomNumber]) {
+            const userSpriteIndex = chooserHistory[roomNumber].findIndex(name => name === username);
+
+            if (userSpriteIndex === -1) {
+                chooserHistory[roomNumber] = chooserHistory[roomNumber].filter(item => item !== username);
+            };
+        };
+        io.to(roomNumber).emit('user_left', username);
     });
 
 
@@ -151,6 +175,22 @@ io.on('connection', (socket) => {
             if (userIndex !== -1) {
 
                 room[userIndex].height = data.height;
+            }
+        }
+    });
+
+    socket.on('rotate_sprite', (data) => {
+        const roomNumber = data.roomNumber
+        io.to(roomNumber).emit('move3_sprite', { username: data.username, rotation: data.rotation });
+
+        if (spriteHistory.hasOwnProperty(data.roomNumber)) {
+
+            const room = spriteHistory[roomNumber];
+
+            const userIndex = room.findIndex(user => user.username === data.username);
+            if (userIndex !== -1) {
+
+                room[userIndex].rotation = data.rotation;
             }
         }
     });

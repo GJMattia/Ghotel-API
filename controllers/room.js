@@ -14,8 +14,26 @@ module.exports = {
     deleteRoom,
     roomColor,
     searchUser,
-    wallType
+    wallType,
+    editRoom
 };
+
+async function editRoom(req, res) {
+    try {
+        const room = await Room.findOne({ _id: req.body.roomID }).select('roomName roomDescription');
+
+        room.roomName = req.body.roomName;
+        room.roomDescription = req.body.roomDescription;
+
+        await room.save();
+        res.json(room);
+    } catch (error) {
+        console.error('Error rotating furni', error);
+        res.status(500).json({ error: 'there was an error rotating the furni' })
+    }
+};
+
+
 
 async function wallType(req, res) {
     try {

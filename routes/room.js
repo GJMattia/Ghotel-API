@@ -28,4 +28,8 @@ router.put('/search/user', roomCtrl.searchUser);
 
 router.put('/room/wall', roomCtrl.wallType);
 
+router.put('/edit/room', roomCtrl.editRoom);
+
+
+
 module.exports = router;
