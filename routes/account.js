@@ -13,7 +13,11 @@ router.put('/clear/inventory', accountCtrl.clearInventory);
 
 router.put('/change/sprite', accountCtrl.changeSprite);
 
-router.get('/user/:username', accountCtrl.getSprite)
+router.get('/user/:username', accountCtrl.getSprite);
+
+router.put('/change/badges', accountCtrl.changeBadges);
+
+router.put('/change/motto', accountCtrl.changeMotto);
 
 
 module.exports = router;

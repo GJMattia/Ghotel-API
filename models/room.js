@@ -5,7 +5,8 @@ const furni = new Schema({
     furniID: { type: Number, required: true },
     rotation: { type: Boolean, default: false },
     state: { type: Boolean, default: false },
-    height: { type: Number, required: true }
+    height: { type: Number, required: true },
+    dice: { type: Number, required: false }
 });
 
 const room = new Schema({

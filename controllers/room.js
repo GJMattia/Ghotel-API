@@ -99,13 +99,36 @@ async function clearRoom(req, res) {
 
 async function useFurni(req, res) {
     try {
+        const randomNumber = Math.floor(Math.random() * 6) + 1;
         const room = await Room.findOne({ _id: req.body.roomID }).select('room');
-        room.room[req.body.tileID][req.body.furniIndex].state = !room.room[req.body.tileID][req.body.furniIndex].state;
-        await room.save();
-        res.json({ tile: room.room[req.body.tileID], tileID: req.body.tileID });
+        let item = room.room[req.body.tileID][req.body.furniIndex];
+
+
+
+        if (req.body.furniID === 26) {
+            if (item.dice !== 0 && !item.state) {
+                item.dice = 0;
+                await room.save();
+                res.json({ tile: room.room[req.body.tileID], tileID: req.body.tileID });
+            } else if (item.dice === 0 && !item.state) {
+                item.state = !item.state;
+                await room.save();
+                res.json({ tile: room.room[req.body.tileID], tileID: req.body.tileID });
+            }
+            else if (item.dice === 0 && item.state) {
+                item.state = !item.state;
+                item.dice = randomNumber;
+                await room.save();
+                res.json({ tile: room.room[req.body.tileID], tileID: req.body.tileID });
+            }
+        } else {
+            room.room[req.body.tileID][req.body.furniIndex].state = !room.room[req.body.tileID][req.body.furniIndex].state;
+            await room.save();
+            res.json({ tile: room.room[req.body.tileID], tileID: req.body.tileID });
+        }
     } catch (error) {
-        console.error('error picking furni', error);
-        res.status(500).json({ error: 'error picking furni' })
+        console.error('error using furni', error);
+        res.status(500).json({ error: 'error using furni' })
     }
 };
 
@@ -169,18 +192,30 @@ async function placeFurni(req, res) {
             state: false,
             height: req.body.furniHeight
         };
+
+        let dice = {
+            furniID: req.body.furniID,
+            rotation: false,
+            state: false,
+            height: req.body.furniHeight,
+            dice: 0
+        };
+
         let tile = req.body.tileID;
 
-        if (req.body.furniID === 1) {
-
+        if (req.body.furniID === 26) {
+            room.room[req.body.tileID].push(dice);
+            await room.save();
+            res.json(room.room[tile]);
+        } else if (req.body.furniID === 1) {
             room.room[tile].push(p1);
             room.room[tile - 13].push(p2);
             room.room[tile - 12].push(p4);
             room.room[tile + 1].push(p3);
             await room.save();
             res.json({ tile1: room.room[tile], tile2: room.room[tile - 13], tile3: room.room[tile - 12], tile4: room.room[tile + 1] })
-        } else {
 
+        } else {
             room.room[req.body.tileID].push(newFurni);
             await room.save();
             res.json(room.room[tile]);

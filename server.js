@@ -128,6 +128,11 @@ io.on('connection', (socket) => {
         io.to(roomNumber).emit('receive_change', { username, roomChange });
     })
 
+    //Room Change
+    socket.on('info_change', (roomInfo) => {
+        io.to(roomInfo.chat).emit('info_update', roomInfo);
+    })
+
 
     //Sprites
 

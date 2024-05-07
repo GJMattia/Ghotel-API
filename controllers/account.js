@@ -7,7 +7,33 @@ module.exports = {
     buyFurni,
     clearInventory,
     changeSprite,
-    getSprite
+    getSprite,
+    changeBadges,
+    changeMotto
+};
+
+async function changeMotto(req, res) {
+    try {
+        const account = await Account.findOne({ user: req.user._id }, { motto: 1 });
+        account.motto = req.body.motto;
+        await account.save();
+        res.json(account.motto);
+    } catch (error) {
+        console.error('Error changing sprite', error);
+        res.status(500).json({ error: 'error changing sprite' })
+    }
+};
+
+async function changeBadges(req, res) {
+    try {
+        const account = await Account.findOne({ user: req.user._id }, { badges: 1 });
+        account.badges = req.body;
+        await account.save();
+        res.json(account.badges);
+    } catch (error) {
+        console.error('Error changing sprite', error);
+        res.status(500).json({ error: 'error changing sprite' })
+    }
 };
 
 async function getSprite(req, res) {
