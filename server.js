@@ -38,7 +38,7 @@ app.use('/room', ensureLoggedIn, roomRouter);
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: 'https://ghotel-client.onrender.com',
+        origin: 'https://www.ghotel.org',
         // origin: 'http://localhost:5173',
         methods: ['GET', 'POST']
     },
