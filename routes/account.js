@@ -19,5 +19,9 @@ router.put('/change/badges', accountCtrl.changeBadges);
 
 router.put('/change/motto', accountCtrl.changeMotto);
 
+router.put('/send/credits', accountCtrl.sendCredits);
+
+router.put('/get/credits', accountCtrl.getCredits);
+
 
 module.exports = router;

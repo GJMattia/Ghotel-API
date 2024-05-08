@@ -9,7 +9,33 @@ module.exports = {
     changeSprite,
     getSprite,
     changeBadges,
-    changeMotto
+    changeMotto,
+    sendCredits,
+    getCredits
+};
+
+async function getCredits(req, res) {
+    try {
+        const account = await Account.findOne({ user: req.user._id }, { credits: 1 });
+        account.credits = account.credits + parseInt(req.body.credits);
+        await account.save();
+        res.json(account.credits);
+    } catch (error) {
+        console.error('Error getting credits', error);
+        res.status(500).json({ error: 'error getting credits' })
+    }
+};
+
+async function sendCredits(req, res) {
+    try {
+        const account = await Account.findOne({ user: req.user._id }, { credits: 1 });
+        account.credits = account.credits - parseInt(req.body.credits);
+        await account.save();
+        res.json(account.credits);
+    } catch (error) {
+        console.error('Error changing sprite', error);
+        res.status(500).json({ error: 'error changing sprite' })
+    }
 };
 
 async function changeMotto(req, res) {

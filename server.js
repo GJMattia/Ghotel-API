@@ -131,11 +131,17 @@ io.on('connection', (socket) => {
     //Room Change
     socket.on('info_change', (roomInfo) => {
         io.to(roomInfo.chat).emit('info_update', roomInfo);
-    })
+    });
+
+    //Sending Credits
+
+    socket.on('send_credits', (data) => {
+        const roomNumber = data.roomNumber
+        io.to(roomNumber).emit('get_credits', { sender: data.username, person: data.person, credits: data.credits });
+    });
 
 
     //Sprites
-
     socket.on('add_sprite', (data) => {
         const { roomNumber } = data;
         // Check if the roomNumber exists in spriteHistory
