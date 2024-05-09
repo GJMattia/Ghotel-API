@@ -136,8 +136,8 @@ io.on('connection', (socket) => {
     //Sending Credits
 
     socket.on('send_credits', (data) => {
-        const roomNumber = data.roomNumber
-        io.to(roomNumber).emit('get_credits', { sender: data.username, person: data.person, credits: data.credits });
+        const roomNumber = data.roomNumber;
+        io.to(roomNumber).emit('get_credits', { sender: data.username, person: data.person, credits: data.credits, room: data.roomNumber });
     });
 
 

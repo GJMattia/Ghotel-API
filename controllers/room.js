@@ -105,24 +105,19 @@ async function useFurni(req, res) {
 
 
 
-        if (req.body.furniID === 26) {
-            if (item.dice !== 0 && !item.state) {
-                item.dice = 0;
-                await room.save();
-                res.json({ tile: room.room[req.body.tileID], tileID: req.body.tileID });
-            } else if (item.dice === 0 && !item.state) {
-                item.state = !item.state;
-                await room.save();
-                res.json({ tile: room.room[req.body.tileID], tileID: req.body.tileID });
-            }
-            else if (item.dice === 0 && item.state) {
-                item.state = !item.state;
-                item.dice = randomNumber;
-                await room.save();
-                res.json({ tile: room.room[req.body.tileID], tileID: req.body.tileID });
-            }
-        } else {
-            room.room[req.body.tileID][req.body.furniIndex].state = !room.room[req.body.tileID][req.body.furniIndex].state;
+        if (req.body.furniID === 26 && !item.state) {
+            item.state = true;
+            item.dice = randomNumber;
+            await room.save();
+            res.json({ tile: room.room[req.body.tileID], tileID: req.body.tileID });
+        } else if (req.body.furniID === 26 && item.state) {
+            item.state = false;
+            item.dice = 0;
+            await room.save();
+            res.json({ tile: room.room[req.body.tileID], tileID: req.body.tileID });
+        }
+        else {
+            item.state = !item.state;
             await room.save();
             res.json({ tile: room.room[req.body.tileID], tileID: req.body.tileID });
         }
