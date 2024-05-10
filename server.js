@@ -44,12 +44,31 @@ const io = new Server(server, {
     },
 });
 
-const messageHistory = {};
-const spriteHistory = {};
-const chooserHistory = {};
+let messageHistory = {};
+let spriteHistory = {};
+let chooserHistory = {};
 
 
 io.on('connection', (socket) => {
+
+    //Debug
+    socket.on('get_history', (data) => {
+        socket.join(data);
+
+        io.to(data).emit('send_history', { chooser: chooserHistory, sprites: spriteHistory });
+
+    });
+
+    socket.on('send_clear', (data) => {
+        spriteHistory = {};
+        chooserHistory = {};
+        io.to(data).emit('clear_info', { chooser: chooserHistory, sprites: spriteHistory });
+
+    });
+
+
+
+
     // CHAT
     socket.on('join_chat', (data) => {
         const { room } = data;
